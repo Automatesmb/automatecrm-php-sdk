@@ -1,0 +1,38 @@
+{
+    "name": "automatecrm/sdk",
+    "type": "library",
+    "description": "A PHP wrapper for automateCRM REST API",
+    "keywords": ["automatecrm", "api"],
+    "homepage": "https://github.com/Automatesmb/automatecrm-php-sdk",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "AutomateCRM Team",
+            "email": "it@automatesmb.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0"
+    },
+    "require-dev": {
+        "guzzlehttp/guzzle": "^6.3 || ^7.0",
+        "phpunit/phpunit": ">=7.0 < 10"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "An HTTP client to execute the API requests"
+    },
+    "autoload": {
+        "psr-4": {
+            "Automatecrm\\": "src/Automatecrm/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "": "src/Automatecrm/",
+            "Automatecrm\\Tests\\": "tests/Automatecrm/"
+        }
+    },
+    "config": {
+        "lock": false
+    }
+}
