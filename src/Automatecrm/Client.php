@@ -22,7 +22,7 @@ class Client {
 	var $servicebase = 'webservice.php';
 
 	// HTTP Client instance
-	var $client = false;
+	var $client 	= false;
 	// Service URL to which client connects to
 	var $serviceurl = false;
 
@@ -58,6 +58,16 @@ class Client {
 		$ex = explode('x', $id);
 		return $ex[1];
 	}
+	
+	/**
+	 * Get Result Column Names.
+	 */
+	private function getResult($response){
+		$body = (string) $response->getBody();
+		
+		return json_decode($body,1);
+	}
+	 
 	
 	/**
 	 * Get Result Column Names.
@@ -113,7 +123,8 @@ class Client {
 			'operation' => 'getchallenge',
 			'username'  => $username
 		);
-		$resultdata = $this->client->request('GET','',['query' => $data]);
+		$response = $this->client->request('GET','',['query' => $data]);
+		$resultdata = $this->getResult($response);
 
 		if($this->hasError($resultdata)) {
 			return false;
@@ -137,8 +148,9 @@ class Client {
 			'username'  => $username,
 			'accessKey' => md5($this->servicetoken.$userAccesskey)
 		);
-		$resultdata = $this->client->request('POST','',['form_params' => $data]);
-
+		$response = $this->client->request('POST','',['form_params' => $data]);
+		$resultdata = $this->getResult($response);
+		
 		if($this->hasError($resultdata)) {
 			return false;
 		}
@@ -153,18 +165,21 @@ class Client {
 	/**
 	 * Do Query Operation.
 	 */
-	public function doQuery($query) {
+	public function doQuery($query,$resolveId = false) {
 
 		// Make sure the query ends with ;
 		$query = trim($query);
 		if(strripos($query, ';') != strlen($query)-1) $query .= ';';
 
 		$data = Array(
-			'operation' => 'query',
-			'sessionName'  => $this->sessionid,
-			'query'  => $query
+			'operation' 	=> 'query',
+			'sessionName'  	=> $this->sessionid,
+			'query'  		=> $query,
+			'resolveid' 	=> $resolveId
 		);
-		$resultdata = $this->client->request('GET','',['query' => $data]);
+		$response = $this->client->request('GET','',['query' => $data]);
+		$resultdata = $this->getResult($response);
+		
 		if($this->hasError($resultdata)) {
 			return false;
 		}
@@ -177,10 +192,12 @@ class Client {
 	public function doListTypes() {
 
 		$data = Array(
-			'operation' => 'listtypes',
-			'sessionName'  => $this->sessionid
+			'operation' 	=> 'listtypes',
+			'sessionName'  	=> $this->sessionid
 		);
-		$resultdata = $this->client->request('GET','',['query' => $data]);
+		$response = $this->client->request('GET','',['query' => $data]);
+		$resultdata = $this->getResult($response);
+		
 		if($this->hasError($resultdata)) {
 			return false;
 		}
@@ -200,11 +217,13 @@ class Client {
 	public function doDescribe($module) {
 
 		$data = Array(
-			'operation' => 'describe',
-			'sessionName'  => $this->sessionid,
-			'elementType' => $module
+			'operation' 	=> 'describe',
+			'sessionName'  	=> $this->sessionid,
+			'elementType' 	=> $module
 		);
-		$resultdata = $this->client->request('GET','',['query' => $data]);
+		$response = $this->client->request('GET','',['query' => $data]);
+		$resultdata = $this->getResult($response);
+		
 		if($this->hasError($resultdata)) {
 			return false;
 		}
@@ -217,11 +236,13 @@ class Client {
 	public function doRetrieve($record) {
 
 		$data = Array(
-			'operation' => 'retrieve',
-			'sessionName'  => $this->sessionid,
-			'id' => $record
+			'operation' 	=> 'retrieve',
+			'sessionName'  	=> $this->sessionid,
+			'id' 			=> $record
 		);
-		$resultdata = $this->client->request('GET','',['query' => $data]);
+		$response = $this->client->request('GET','',['query' => $data]);
+		$resultdata = $this->getResult($response);
+		
 		if($this->hasError($resultdata)) {
 			return false;
 		}
@@ -244,7 +265,9 @@ class Client {
 			'elementType' => $module,
 			'element'     => json_encode($valuemap)
 		);
-		$resultdata = $this->client->request('POST','',['form_params' => $data]);
+		$response = $this->client->request('POST','',['form_params' => $data]);
+		$resultdata = $this->getResult($response);
+		
 		if($this->hasError($resultdata)) {
 			return false;
 		}
@@ -267,7 +290,9 @@ class Client {
 			'elementType' => $module,
 			'element'     => json_encode($valuemap)
 		);
-		$resultdata = $this->client->request('POST','',['form_params' => $data]);
+		$response = $this->client->request('POST','',['form_params' => $data]);
+		$resultdata = $this->getResult($response);
+		
 		if($this->hasError($resultdata)) {
 			return false;
 		}
@@ -290,7 +315,9 @@ class Client {
 			'elementType' => $module,
 			'element'     => json_encode($valuemap)
 		);
-		$resultdata = $this->client->request('POST','',['form_params' => $data]);
+		$response = $this->client->request('POST','',['form_params' => $data]);
+		$resultdata = $this->getResult($response);
+		
 		if($this->hasError($resultdata)) {
 			return false;
 		}
@@ -307,8 +334,8 @@ class Client {
 	public function doInvoke($method, $params = null, $type = 'POST') {
 
 		$senddata = Array(
-			'operation' => $method,
-			'sessionName' => $this->sessionid
+			'operation' 	=> $method,
+			'sessionName' 	=> $this->sessionid
 		);
 		if(!empty($params)) {
 			foreach($params as $k=>$v) {
@@ -320,14 +347,15 @@ class Client {
 
 		$resultdata = false;
 		if(strtoupper($type) == "POST") {
-			$resultdata = $this->client->request('POST','',['form_params' => $data]);
+			$response = $this->client->request('POST','',['form_params' => $data]);
 		} else {
-			$resultdata = $this->client->request('GET','',['query' => $data]);
+			$response = $this->client->request('GET','',['query' => $data]);
 		}
-
+		$resultdata = $this->getResult($response);
+		
 		if($this->hasError($resultdata)) {
 			return false;
 		}
-		return $resultdata[result];
+		return $resultdata['result'];
 	}
 }
