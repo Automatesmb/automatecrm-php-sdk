@@ -4,7 +4,7 @@
 A PHP client SDK for automateCRM REST API.
 
 
-
+REST API overview: https://github.com/Automatesmb/automatecrm-php-sdk/wiki/automateCRM-REST-API
 
 
 
