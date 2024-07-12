@@ -1,5 +1,5 @@
 
-# automatecrm-php
+# automatecrm-php-sdk
 
 A PHP client SDK for automateCRM REST API.
 
@@ -31,7 +31,7 @@ php composer.phar update
 
 
 You will need to get 3 details to instantiate the client:
-1. CRM URL, such as https://demo.automatecrm.io/
+1. CRM URL, such as https://mycompany.automatecrm.io/
 2. User name
 3. Access key, this is available under the user's profile details
 
